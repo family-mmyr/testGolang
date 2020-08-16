@@ -1,0 +1,2 @@
+# testGolang
+Goのtest用
