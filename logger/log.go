@@ -9,10 +9,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type texFormat struct {
+const LoggerVer = "v1"
+
+type TextFormatter struct {
+	RequestID string
 }
 
-func (f *texFormat) Format(entry *logrus.Entry) ([]byte, error) {
+func (f *TextFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	var b *bytes.Buffer
 
 	if entry.Buffer != nil {
@@ -28,21 +31,21 @@ func (f *texFormat) Format(entry *logrus.Entry) ([]byte, error) {
 
 	// version
 	b.WriteByte('[')
-	b.WriteString(strings.ToUpper(entry.Level.String()))
+	b.WriteString(LoggerVer)
 	b.WriteString("] ")
 
 	// timestamp
 	b.WriteString(entry.Time.Format(time.RFC3339))
 
 	// request_id
-	b.WriteByte('[')
-	b.WriteString(strings.ToUpper(entry.Level.String()))
+	b.WriteString(" [")
+	b.WriteString(f.RequestID)
 	b.WriteString("] ")
 
 	// msg
-	b.WriteByte('[')
-	b.WriteString(strings.ToUpper(entry.Level.String()))
-	b.WriteString("] ")
+	if entry.Message != "" {
+		b.WriteString(entry.Message)
+	}
 
 	// data
 	for key, value := range entry.Data {
